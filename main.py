@@ -1,5 +1,5 @@
 import sys
-import connector.sample_data
+import connector.data_source
 import connector.data_service
 
 
@@ -12,10 +12,10 @@ if __name__ == '__main__':
             sys.exit()
 
         if sys.argv[1] == 'data-source':
-            connector.sample_data.failed_call_to_container_api()
-            connector.sample_data.append_sample_products()
-            connector.sample_data.log_something()
-            connector.sample_data.read_env_var_and_exit()
+            connector.data_source.failed_call_to_container_api()
+            connector.data_source.append_sample_products()
+            connector.data_source.log_something()
+            connector.data_source.read_env_var_and_exit()
             sys.exit()
 
         if sys.argv[1] == 'data-service':
