@@ -1,26 +1,44 @@
-# Sample Python data source connector
+# Sample Python connector
 
-Sample connector in python to import the data into Productsup.
+It provides two types of connectors:
+  * Data source - import the data into the Productsup platofrm
+  * Data service - manipulate the existing data in Productsup platform
 
 ## Create, configure, build, deploy connector in the Developer portal
 
 #### Create connector
-* Login into the [Dev portal](https://cde-main.productsup.com)
+* Login into the [Dev portal](https://dev-portal.productsup.com)
 * Add new connector with the following attributes:
-  * Type: `data source` (Import the data into Productsup platform)
+  * Type: `data source` or `data service`, 
   * Execution mode: `environemnt variable` (Connector will receive configuration options via environment variables)
 
-#### Configure connector
+#### Configure data source connector
 * Version control
   * Configure version control based on your VCS provider
 * Application
   * Command: `python`
-  * Arguments `main.py`
+  * Arguments `main.py data-source`
   * Health check: `--health-check`
 * Individual configurations
   * Command option: `SHOULD_FAIL`; Field type: `checkbox`
   * Command option: `NAME`; Field type: `input`
 
+
+#### Configure data service connector
+* Version control
+  * Configure version control based on your VCS provider
+* Application
+  * Command: `python`
+  * Arguments `main.py data-service`
+  * Health check: `--health-check`
+* Individual configurations
+  * Command option: `NEW_COLUMN_NAME`; Field type: `input`
+  * Command option: `SOURCE_COLUMN`; Field type: `stage_columns_dropdown`
+* Data service configuration:
+  * Service type: `internal`
+  * Stage: `import`
+  * Column prefix: `___prefix`
+  * Max usage: `1`
 
 #### Build, deploy connector
 * In the release configuration trigger build. If everything was configured correctly it should succeed.
