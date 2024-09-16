@@ -95,7 +95,13 @@ class ContainerApi:
     def yield_from_file_batch(self, 
                               file: InputFile,
                               batch_size: int = 100):
-        yield self.read_from_file_batch(file, batch_size)
+        while True:
+            products = self.read_from_file_batch(file, batch_size)
+            
+            if products is None:
+                break
+
+            yield products
 
     def log(self,
             level: str,
