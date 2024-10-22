@@ -1,6 +1,8 @@
 import sys
 import connector.data_source
 import connector.data_service
+import connector.export
+import connector.export_delta
 
 
 if __name__ == '__main__':
@@ -20,5 +22,15 @@ if __name__ == '__main__':
 
         if sys.argv[1] == 'data-service':
             connector.data_service.data_service()
+
+            sys.exit()
+
+        if sys.argv[1] == 'export':
+            connector.export.export()
+
+            sys.exit()
+
+        if sys.argv[1] == 'export-delta':
+            connector.export_delta.export()
 
             sys.exit()

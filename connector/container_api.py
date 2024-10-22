@@ -26,6 +26,10 @@ class OutputFile(StrEnum):
 
 class InputFile(StrEnum):
     FULL = 'full'
+    NEW = 'new'
+    MODIFIED = 'modified'
+    UNCHANGED = 'unchanged'
+    DELETED = 'deleted'
 
 class LogLevel(StrEnum):
     SUCCESS = 'success'
