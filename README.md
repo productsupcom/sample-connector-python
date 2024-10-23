@@ -23,7 +23,6 @@ It provides two types of connectors:
   * Command option: `SHOULD_FAIL`; Field type: `checkbox`
   * Command option: `NAME`; Field type: `input`
 
-
 #### Configure data service connector
 * Version control
   * Configure version control based on your VCS provider
@@ -39,6 +38,36 @@ It provides two types of connectors:
   * Stage: `import`
   * Column prefix: `___prefix`
   * Max usage: `1`
+
+#### Configure export connector
+* Create new channel template for the connector
+  * Channels -> Add Channel
+  * Add template columns required
+* Version control
+  * Configure version control based on your VCS provider
+* Application
+  * Command: `python`
+  * Arguments `main.py export`
+  * Health check: `--health-check`
+* Export configuration
+  * Enable feedback file
+  * Assign channel for the connector
+
+#### Configure export-delta connector
+* Create new channel template for the connector
+  * Channels -> Add Channel
+  * Add template columns required
+  * Mark channel as delta
+  * Set delta key on unique id column
+* Version control
+  * Configure version control based on your VCS provider
+* Application
+  * Command: `python`
+  * Arguments `main.py export-delta`
+  * Health check: `--health-check`
+* Export configuration
+  * Enable feedback file
+  * Assign channel for the connector
 
 #### Build, deploy connector
 * In the release configuration trigger build. If everything was configured correctly it should succeed.
