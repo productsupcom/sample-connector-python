@@ -138,6 +138,43 @@ except ContainerApiError as error:
     print(error.message, file=sys.stderr)
 ```
 
+#### Buckets
+A bucket is a persistent keyed object store the connector can read from and write to. Unlike the per-run input and output files, the data in a bucket survives across runs, which makes it useful for remembering small pieces of state between executions.
+
+A bucket is scoped per connector environment and **shared across all of that connector's sites**, so keys must be namespaced by site or one site would overwrite another's state. This example does that namespacing by default — it keys on `SITE`. You do not configure `SITE`: the caller that runs the connector (the platform's processing) passes it in as part of the run context, alongside values like `ACCOUNT` and `PROJECT`.
+
+`read_from_bucket(key)` and `write_to_bucket(key, data)` map to `GET` and `PUT /buckets/stream/{key}`. Keys must be slash-free. A read of a key that was never written returns `None`.
+
+The snippet below remembers when a full feed was last sent for the current site, so the connector can resend the full feed on a ~30-day cadence:
+
+```python
+import os
+import json
+from datetime import datetime, timedelta, timezone
+
+from connector.container_api import ContainerApi
+
+container_api = ContainerApi()
+
+site = os.environ.get('SITE')
+key = 'last-full-upload-{}'.format(site)  # keys must be slash-free, namespaced per site
+
+now = datetime.now(timezone.utc)
+
+stored = container_api.read_from_bucket(key)
+last_full_upload = None
+if stored is not None:
+    last_full_upload = datetime.fromisoformat(json.loads(stored)['last_full_upload'])
+
+if last_full_upload is None or now - last_full_upload >= timedelta(days=30):
+    # ... send the full feed ...
+    container_api.write_to_bucket(key, json.dumps({'site': site, 'last_full_upload': now.isoformat()}))
+```
+
+A bucket has to be provisioned and linked to your connector before any of this works — the export example above writes to a bucket, so it will not run end to end until one is linked. Bucket provisioning is **not yet available in the Dev Portal UI**; until it is, the CDE team can create a bucket and link it to your connector (per environment) via the CDE API. Reach out to your CDE representative to have one set up.
+
+The older `/buckets/exchange/...` endpoints are deprecated in favour of `/buckets/stream/{key}`.
+
 ### Individual configurations
 Depending on the connector execution mode (chosen in the step when creating a connector), configurations made by the user in the platform will be passed by:
   * Command line arguments

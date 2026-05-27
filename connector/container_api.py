@@ -2,6 +2,8 @@ import typing
 
 from enum import StrEnum
 
+import httpx
+
 from .cde_container_api_client import Client
 
 from .cde_container_api_client.models import WriteToOutputFileInput, WriteToOutputFileInputMeta, \
@@ -122,3 +124,29 @@ class ContainerApi:
             raise ContainerApiError('{} {}'.format(response.message, response.errors.to_dict()))
 
         return response
+
+    def write_to_bucket(self, key: str, data: str) -> None:
+        response = self._bucket_request('put', key, content=data)
+        if not response.is_success:
+            raise ContainerApiError('Failed to write bucket key {} (status {})'.format(key, response.status_code))
+
+    def read_from_bucket(self, key: str) -> typing.Optional[str]:
+        response = self._bucket_request('get', key)
+        if not response.is_success:
+            return None
+
+        return response.text
+
+    def _bucket_request(self, method: str, key: str, content: typing.Optional[str] = None) -> httpx.Response:
+        url = "{}/buckets/stream/{}".format(self.client.base_url, key)
+
+        return httpx.request(
+            method=method,
+            url=url,
+            headers=self.client.get_headers(),
+            cookies=self.client.get_cookies(),
+            timeout=self.client.get_timeout(),
+            follow_redirects=self.client.follow_redirects,
+            verify=self.client.verify_ssl,
+            content=content,
+        )
